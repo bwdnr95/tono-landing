@@ -1,14 +1,11 @@
 {
   "buildCommand": "cd frontend && npm install && npm run build",
   "outputDirectory": "frontend/dist",
-  "installCommand": "echo 'skip'",
+  "installCommand": "echo skip",
   "framework": null,
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "https://api.tono-operation.com/api/$1" }
-  ],
-  "routes": [
-    { "handle": "filesystem" },
-    { "src": "/(.*)", "dest": "/index.html" }
+    { "source": "/api/(.*)", "destination": "/api/index.py" },
+    { "source": "/(.*)", "destination": "/index.html" }
   ],
   "headers": [
     {
