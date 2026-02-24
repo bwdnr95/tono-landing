@@ -1,0 +1,35 @@
+# Dependencies
+frontend/node_modules/
+backend/.venv/
+
+# Build output
+frontend/dist/
+
+# Environment & secrets
+backend/.env
+backend/credentials.json
+backend/gmail_token.json
+backend/google_sheets_key.json
+backend/authorized_user.json
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/
+.idea/
+
+# Claude Code local
+.claude/
+
+# Python
+__pycache__/
+*.pyc
+
+# Logs
+*.log
+
+# Contacts backup (local only)
+backend/contacts/
