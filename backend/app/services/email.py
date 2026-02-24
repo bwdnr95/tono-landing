@@ -7,7 +7,6 @@ from email.mime.text import MIMEText
 
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
-from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 
 from app.models.contact import ContactRequest
@@ -21,22 +20,31 @@ SCOPES = ["https://www.googleapis.com/auth/gmail.send"]
 
 
 def _get_gmail_service():
-    """Gmail API 서비스 객체를 반환한다. 인증 미완료 시 None."""
-    if not os.path.isfile(CREDENTIALS_PATH):
-        logger.warning("credentials.json 없음 — 이메일 발송 생략")
-        return None
-
+    """Gmail API 서비스 객체를 반환한다. 환경변수 우선, 파일 폴백."""
     creds = None
-    if os.path.isfile(GMAIL_TOKEN_PATH):
+
+    # 1) 환경변수에서 토큰 로드 (배포 환경)
+    token_json = os.getenv("GMAIL_TOKEN_JSON")
+    if token_json:
+        info = json.loads(token_json)
+        creds = Credentials.from_authorized_user_info(info, SCOPES)
+    # 2) 파일에서 토큰 로드 (로컬 환경)
+    elif os.path.isfile(GMAIL_TOKEN_PATH):
         creds = Credentials.from_authorized_user_file(GMAIL_TOKEN_PATH, SCOPES)
 
-    if not creds or not creds.valid:
-        if creds and creds.expired and creds.refresh_token:
+    if not creds:
+        logger.warning("Gmail 토큰 없음 — 이메일 발송 생략")
+        return None
+
+    if not creds.valid:
+        if creds.expired and creds.refresh_token:
             creds.refresh(Request())
-            with open(GMAIL_TOKEN_PATH, "w") as f:
-                f.write(creds.to_json())
+            # 파일 기반이면 갱신된 토큰 저장
+            if not token_json and os.path.isfile(GMAIL_TOKEN_PATH):
+                with open(GMAIL_TOKEN_PATH, "w") as f:
+                    f.write(creds.to_json())
         else:
-            logger.warning("gmail_token.json 없거나 만료됨 — setup_gmail.py를 실행하세요")
+            logger.warning("Gmail 토큰 만료 — 재인증 필요")
             return None
 
     return build("gmail", "v1", credentials=creds)

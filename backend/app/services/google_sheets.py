@@ -1,8 +1,10 @@
+import json
 import logging
 import os
 from datetime import datetime
 
 import gspread
+from google.oauth2.credentials import Credentials
 
 from app.models.contact import ContactRequest
 
@@ -22,25 +24,41 @@ HEADERS = [
     "메시지",
 ]
 
+SHEETS_SCOPES = [
+    "https://www.googleapis.com/auth/spreadsheets",
+    "https://www.googleapis.com/auth/drive",
+]
+
 
 def _get_worksheet() -> gspread.Worksheet | None:
-    """Google Sheets 워크시트를 반환한다. 설정 미완료 시 None."""
+    """Google Sheets 워크시트를 반환한다. 환경변수 우선, 파일 폴백."""
     sheets_id = os.getenv("GOOGLE_SHEETS_ID", "")
     if not sheets_id:
         logger.debug("GOOGLE_SHEETS_ID 미설정 — Sheets 기록 생략")
         return None
 
-    credentials_path = os.path.join(BACKEND_DIR, "credentials.json")
-    authorized_user_path = os.path.join(BACKEND_DIR, "authorized_user.json")
+    gc = None
 
-    if not os.path.isfile(credentials_path):
-        logger.warning("credentials.json 없음 — Sheets 기록 생략")
-        return None
+    # 1) 환경변수에서 인증 (배포 환경)
+    auth_json = os.getenv("GOOGLE_AUTHORIZED_USER_JSON")
+    if auth_json:
+        info = json.loads(auth_json)
+        creds = Credentials.from_authorized_user_info(info, SHEETS_SCOPES)
+        gc = gspread.authorize(creds)
+    else:
+        # 2) 파일에서 인증 (로컬 환경)
+        credentials_path = os.path.join(BACKEND_DIR, "credentials.json")
+        authorized_user_path = os.path.join(BACKEND_DIR, "authorized_user.json")
 
-    gc = gspread.oauth(
-        credentials_filename=credentials_path,
-        authorized_user_filename=authorized_user_path,
-    )
+        if not os.path.isfile(credentials_path):
+            logger.warning("credentials.json 없음 — Sheets 기록 생략")
+            return None
+
+        gc = gspread.oauth(
+            credentials_filename=credentials_path,
+            authorized_user_filename=authorized_user_path,
+        )
+
     spreadsheet = gc.open_by_key(sheets_id)
     return spreadsheet.sheet1
 
