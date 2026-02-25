@@ -51,7 +51,6 @@ const services = [
     ],
     target: '운영에서 완전히 손을 떼려는 소유주 / 다수 숙소 보유 자산가',
     summary: '소유주의 체력에 의존하지 않는 구조로, 숙소를 지속 가능한 수익 자산으로 전환합니다.',
-    revenueShare: true,
   },
 ]
 
@@ -151,44 +150,6 @@ export default function ServicePage() {
                 "{s.summary}"
               </div>
 
-              {s.revenueShare && (
-                <div style={{ marginTop: '32px' }}>
-                  <h4 className="font-outfit" style={{ fontSize: '0.9rem', fontWeight: 700, marginBottom: '16px', color: 'var(--ac)' }}>
-                    수익 배분 구조
-                  </h4>
-                  <div style={{ display: 'flex', gap: '16px', marginBottom: '20px' }}>
-                    <div style={{
-                      flex: 1,
-                      padding: '20px',
-                      background: 'rgba(184,132,95,0.06)',
-                      border: '1px solid rgba(184,132,95,0.2)',
-                      borderRadius: '12px',
-                      textAlign: 'center',
-                    }}>
-                      <div className="font-mono" style={{ fontSize: '1.8rem', fontWeight: 700, color: 'var(--ac-l)' }}>60%</div>
-                      <div style={{ fontSize: '0.8rem', color: 'var(--tx-s)', marginTop: '4px' }}>소유주</div>
-                    </div>
-                    <div style={{
-                      flex: 1,
-                      padding: '20px',
-                      background: 'var(--bg-card)',
-                      border: '1px solid var(--bd)',
-                      borderRadius: '12px',
-                      textAlign: 'center',
-                    }}>
-                      <div className="font-mono" style={{ fontSize: '1.8rem', fontWeight: 700, color: 'var(--tx-s)' }}>40%</div>
-                      <div style={{ fontSize: '0.8rem', color: 'var(--tx-s)', marginTop: '4px' }}>TONO</div>
-                    </div>
-                  </div>
-                  <p style={{ fontSize: '0.78rem', color: 'var(--tx-d)', lineHeight: 1.7, fontWeight: 300 }}>
-                    * 순수익 기준 (OTA 수수료·결제 수수료 공제 후 실 입금액 기준)
-                    <br />
-                    * 공제 항목: 청소비, 린넨비, 소모품비, 수선비, 보험료, 공과금, 통신비
-                    <br />
-                    * TONO 비용: 플랫폼 운영비, 셀프체크인 장비 등은 TONO 자체 부담
-                  </p>
-                </div>
-              )}
             </div>
           </div>
         </section>
