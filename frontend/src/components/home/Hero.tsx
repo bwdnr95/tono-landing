@@ -121,7 +121,7 @@ export default function Hero() {
         <p
           style={{
             fontSize: '0.88rem',
-            color: 'var(--tx-d)',
+            color: 'var(--tx-s)',
             lineHeight: 1.7,
             maxWidth: '480px',
             marginBottom: '48px',
@@ -239,7 +239,7 @@ export default function Hero() {
               >
                 {s.num}
               </div>
-              <div style={{ fontSize: '0.75rem', color: 'var(--tx-d)', marginTop: '5px', letterSpacing: '0.5px' }}>
+              <div style={{ fontSize: '0.75rem', color: 'var(--tx-s)', marginTop: '5px', letterSpacing: '0.5px' }}>
                 {s.label}
               </div>
             </div>
