@@ -6,7 +6,7 @@ import SectionTitle from '../components/ui/SectionTitle.tsx'
 const services = [
   {
     num: 'ⅰ',
-    name: 'SaaS 구독 서비스',
+    name: 'TONIFY Lite',
     sub: 'Self-operated',
     desc: '숙소를 직접 운영하는 운영자를 위해 설계된 소프트웨어 기반 운영 관리 서비스입니다. 예약 관리, 고객 응대, 정산, 운영 데이터 분석까지 핵심 기능을 하나의 시스템으로 제공합니다.',
     features: [
@@ -22,7 +22,7 @@ const services = [
   },
   {
     num: 'ⅱ',
-    name: '부분 위탁운영 서비스',
+    name: 'TONIFY Pro',
     sub: 'Part Service',
     desc: '현장 관리는 직접 진행하면서, 고객 소통과 예약 관리 업무를 분리하고 싶은 운영자를 위한 서비스입니다.',
     features: [
@@ -36,7 +36,7 @@ const services = [
   },
   {
     num: 'ⅲ',
-    name: '전체 위탁운영 서비스',
+    name: 'TONIFY Enterprise',
     sub: 'Full Service',
     desc: '숙소 운영 전반을 통합 관리하는 전체 위탁운영 서비스입니다. 운영자는 큰 방향과 의사결정에 집중하고, 실제 운영은 TONO OPERATION이 구조적으로 관리합니다.',
     features: [
@@ -214,9 +214,9 @@ export default function ServicePage() {
               <thead>
                 <tr style={{ borderBottom: '1px solid var(--bd)' }}>
                   <th style={{ padding: '20px 24px', textAlign: 'left', fontSize: '0.85rem', fontWeight: 600, color: 'var(--tx)' }}>기능</th>
-                  <th className="font-outfit" style={{ padding: '20px 24px', textAlign: 'center', fontSize: '0.85rem', fontWeight: 700, color: 'var(--tx)' }}>SaaS 구독</th>
-                  <th className="font-outfit" style={{ padding: '20px 24px', textAlign: 'center', fontSize: '0.85rem', fontWeight: 700, color: 'var(--ac)' }}>부분 위탁</th>
-                  <th className="font-outfit" style={{ padding: '20px 24px', textAlign: 'center', fontSize: '0.85rem', fontWeight: 700, color: 'var(--tx)' }}>전체 위탁</th>
+                  <th className="font-outfit" style={{ padding: '20px 24px', textAlign: 'center', fontSize: '0.85rem', fontWeight: 700, color: 'var(--tx)' }}>TONIFY Lite</th>
+                  <th className="font-outfit" style={{ padding: '20px 24px', textAlign: 'center', fontSize: '0.85rem', fontWeight: 700, color: 'var(--ac)' }}>TONIFY Pro</th>
+                  <th className="font-outfit" style={{ padding: '20px 24px', textAlign: 'center', fontSize: '0.85rem', fontWeight: 700, color: 'var(--tx)' }}>TONIFY Enterprise</th>
                 </tr>
               </thead>
               <tbody>

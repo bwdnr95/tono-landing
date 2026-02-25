@@ -18,7 +18,7 @@ export default function About() {
       <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
         <div className="anim">
           <SectionTag>ABOUT US</SectionTag>
-          <SectionTitle>공간의 감도를 설계하는 브랜드</SectionTitle>
+          <SectionTitle>TONO OPERATION은 숙박 운영의 모든 것을 담은 스테이테크(STAYTECH) 기업입니다.</SectionTitle>
         </div>
 
         <div className="about-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '48px', marginTop: '56px', alignItems: 'start' }}>

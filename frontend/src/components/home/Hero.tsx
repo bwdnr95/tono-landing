@@ -1,9 +1,9 @@
 import { useNavigate } from 'react-router-dom'
 
 const stats = [
-  { num: '169+', label: '관리 객실' },
-  { num: '37', label: '파트너 숙소' },
-  { num: '88%', label: '월평균 점유율' },
+  { num: '169+', label: 'TONO와 함께하는 숙소' },
+  { num: '88%', label: '월평균 점유율 · 제주 평균 대비 +25%p' },
+  { num: '80%', label: '게스트 문의 AI 자동 처리' },
   { num: '24/7', label: '무중단 운영' },
 ]
 
@@ -114,9 +114,7 @@ export default function Hero() {
             animation: 'fadeUp 0.8s ease-out 0.3s forwards',
           }}
         >
-          예약 관리, 게스트 응대, 가격 최적화, 시설 관리까지 —
-          <br />
-          숙박업 전문가의 경험이 녹아든 운영 시스템이 숙소를 대신 운영합니다.
+          숙소를 TONIFY하면, 운영이 시작됩니다.
         </p>
 
         {/* Detail */}

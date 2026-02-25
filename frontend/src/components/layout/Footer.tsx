@@ -12,6 +12,9 @@ export default function Footer() {
       >
         <div>
           <img src="/tono-logo.png" alt="TONO OPERATION" style={{ height: '26px', opacity: 0.5 }} />
+          <p style={{ fontSize: '0.72rem', color: 'var(--tx-d)', marginTop: '8px', fontWeight: 300 }}>
+            STAYTECH가 숙소 운영을 바꿉니다. 숙소를 TONIFY 하세요.
+          </p>
         </div>
         <div
           style={{

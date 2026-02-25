@@ -6,7 +6,7 @@ import SectionTitle from '../ui/SectionTitle.tsx'
 const tiers = [
   {
     num: 'ⅰ',
-    name: 'SaaS 구독',
+    name: 'TONIFY Lite',
     sub: 'Self-operated',
     desc: '직접 운영을 유지하면서 운영 체계를 정비하고 싶은 운영자를 위한 소프트웨어 서비스입니다.',
     features: [
@@ -20,7 +20,7 @@ const tiers = [
   },
   {
     num: 'ⅱ',
-    name: '부분 위탁',
+    name: 'TONIFY Pro',
     sub: 'Part Service',
     desc: '응대와 예약 관리를 분리하고, 현장 운영에만 집중하고 싶은 운영자를 위한 구조입니다.',
     features: [
@@ -34,7 +34,7 @@ const tiers = [
   },
   {
     num: 'ⅲ',
-    name: '전체 위탁',
+    name: 'TONIFY Enterprise',
     sub: 'Full Service',
     desc: '운영을 전면 위탁하고 자산 관리와 의사결정에만 집중하고 싶은 소유주를 위한 완전 위탁 서비스입니다.',
     features: [
