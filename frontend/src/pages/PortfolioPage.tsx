@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { useScrollAnimation } from '../hooks/useScrollAnimation.ts'
 import SectionTag from '../components/ui/SectionTag.tsx'
 import SectionTitle from '../components/ui/SectionTitle.tsx'
@@ -7,14 +7,14 @@ import SectionTitle from '../components/ui/SectionTitle.tsx'
    사진 목록 — /portfolio/ 폴더에 이미지를 넣고 여기에 경로 추가
    ────────────────────────────────────────────── */
 const images = [
-  '/portfolio/1.png',
-  '/portfolio/2.png',
-  '/portfolio/2-1.png',
-  '/portfolio/2-2.png',
-  '/portfolio/3.png',
-  '/portfolio/4.png',
-  '/portfolio/5.png',
-  '/portfolio/5-1.png',
+  '/portfolio/1.jpg',
+  '/portfolio/2.jpg',
+  '/portfolio/2-1.jpg',
+  '/portfolio/2-2.jpg',
+  '/portfolio/3.jpg',
+  '/portfolio/4.jpg',
+  '/portfolio/5.jpg',
+  '/portfolio/5-1.jpg',
   '/portfolio/5-2.jpg',
   '/portfolio/5-3.jpg',
   '/portfolio/6.jpg',
@@ -23,12 +23,12 @@ const images = [
   '/portfolio/9.jpg',
   '/portfolio/10.jpg',
   '/portfolio/11.jpg',
-  '/portfolio/12.png',
-  '/portfolio/13.png',
-  '/portfolio/14.png',
-  '/portfolio/15.png',
+  '/portfolio/12.jpg',
+  '/portfolio/13.jpg',
+  '/portfolio/14.jpg',
+  '/portfolio/15.jpg',
   '/portfolio/16.jpg',
-  '/portfolio/17.png',
+  '/portfolio/17.jpg',
   '/portfolio/18.jpg',
   '/portfolio/19.jpg',
   '/portfolio/20.jpg',
@@ -43,6 +43,71 @@ const images = [
   '/portfolio/29.jpg',
   '/portfolio/30.jpg',
 ]
+
+function PortfolioImage({ src, index, onClick }: { src: string; index: number; onClick: () => void }) {
+  const [loaded, setLoaded] = useState(false)
+  const [error, setError] = useState(false)
+
+  const handleLoad = useCallback(() => setLoaded(true), [])
+  const handleError = useCallback(() => setError(true), [])
+
+  return (
+    <div
+      onClick={onClick}
+      style={{
+        breakInside: 'avoid',
+        marginBottom: '16px',
+        borderRadius: '12px',
+        overflow: 'hidden',
+        cursor: 'zoom-in',
+        border: '1px solid var(--bd)',
+        transition: 'all 0.4s',
+        // 로드 전 고정 높이로 레이아웃 잡기
+        ...(!loaded && !error ? { aspectRatio: '4/3', background: 'var(--bg-card)' } : {}),
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.borderColor = 'rgba(184,132,95,0.3)'
+        e.currentTarget.style.transform = 'translateY(-3px)'
+        e.currentTarget.style.boxShadow = '0 8px 32px rgba(184,132,95,0.1)'
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.borderColor = 'var(--bd)'
+        e.currentTarget.style.transform = 'translateY(0)'
+        e.currentTarget.style.boxShadow = 'none'
+      }}
+    >
+      {error ? (
+        <div style={{
+          aspectRatio: '4/3',
+          background: 'var(--bg-card)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}>
+          <span style={{ color: 'var(--tx-d)', fontSize: '0.75rem', letterSpacing: '2px', fontFamily: 'monospace' }}>
+            PHOTO
+          </span>
+        </div>
+      ) : (
+        <img
+          src={src}
+          alt=""
+          loading={index < 6 ? 'eager' : 'lazy'}
+          onLoad={handleLoad}
+          onError={handleError}
+          style={{
+            width: '100%',
+            display: 'block',
+            transition: 'transform 0.5s, opacity 0.5s',
+            opacity: loaded ? 1 : 0,
+          }}
+          onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.04)' }}
+          onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1)' }}
+        />
+      )}
+    </div>
+  )
+}
 
 export default function PortfolioPage() {
   const ref = useScrollAnimation()
@@ -96,54 +161,12 @@ export default function PortfolioPage() {
           gap: '16px',
         }}>
           {images.map((src, i) => (
-            <div
-              key={i}
+            <PortfolioImage
+              key={src}
+              src={src}
+              index={i}
               onClick={() => setLightbox(i)}
-              style={{
-                breakInside: 'avoid',
-                marginBottom: '16px',
-                borderRadius: '12px',
-                overflow: 'hidden',
-                cursor: 'zoom-in',
-                border: '1px solid var(--bd)',
-                transition: 'all 0.4s',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.borderColor = 'rgba(184,132,95,0.3)'
-                e.currentTarget.style.transform = 'translateY(-3px)'
-                e.currentTarget.style.boxShadow = '0 8px 32px rgba(184,132,95,0.1)'
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.borderColor = 'var(--bd)'
-                e.currentTarget.style.transform = 'translateY(0)'
-                e.currentTarget.style.boxShadow = 'none'
-              }}
-            >
-              <img
-                src={src}
-                alt=""
-                style={{
-                  width: '100%',
-                  display: 'block',
-                  transition: 'transform 0.5s',
-                }}
-                onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.04)' }}
-                onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1)' }}
-                onError={(e) => {
-                  const parent = e.currentTarget.parentElement!
-                  parent.style.aspectRatio = '4/3'
-                  parent.style.background = 'var(--bg-card)'
-                  parent.style.display = 'flex'
-                  parent.style.alignItems = 'center'
-                  parent.style.justifyContent = 'center'
-                  e.currentTarget.style.display = 'none'
-                  const placeholder = document.createElement('span')
-                  placeholder.textContent = 'PHOTO'
-                  placeholder.style.cssText = 'color:var(--tx-d);font-size:0.75rem;letter-spacing:2px;font-family:monospace'
-                  parent.appendChild(placeholder)
-                }}
-              />
-            </div>
+            />
           ))}
         </div>
       </section>
