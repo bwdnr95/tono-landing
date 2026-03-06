@@ -22,6 +22,7 @@ export default function Navigation() {
 
   return (
     <>
+      <header>
       <nav
         style={{
           position: 'fixed',
@@ -179,6 +180,7 @@ export default function Navigation() {
           </button>
         </div>
       </nav>
+      </header>
 
       {/* Mobile Overlay */}
       {mobileOpen && (

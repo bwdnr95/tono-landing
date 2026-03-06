@@ -99,6 +99,7 @@ export default function Hero() {
           >
             운영은 전문가의 것
           </span>
+          <span className="sr-only"> — 제주·부산 AI 숙소 위탁운영 TONO OPERATION</span>
         </h1>
 
         {/* Sub copy */}

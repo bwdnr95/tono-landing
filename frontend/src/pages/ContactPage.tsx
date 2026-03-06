@@ -136,7 +136,7 @@ export default function ContactPage() {
   }
 
   return (
-    <div ref={ref}>
+    <main ref={ref}>
       {/* Hero */}
       <section style={{ paddingTop: '160px', textAlign: 'center' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto' }} className="anim">
@@ -400,6 +400,6 @@ export default function ContactPage() {
           }
         }
       `}</style>
-    </div>
+    </main>
   )
 }

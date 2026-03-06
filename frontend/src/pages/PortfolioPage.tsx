@@ -91,7 +91,7 @@ function PortfolioImage({ src, index, onClick }: { src: string; index: number; o
       ) : (
         <img
           src={src}
-          alt=""
+          alt={`TONO OPERATION 위탁운영 숙소 ${index + 1}`}
           loading={index < 6 ? 'eager' : 'lazy'}
           onLoad={handleLoad}
           onError={handleError}
@@ -117,7 +117,7 @@ export default function PortfolioPage() {
   const goNext = () => setLightbox((i) => (i !== null && i < images.length - 1 ? i + 1 : i))
 
   return (
-    <>
+    <main>
       {/* Hero */}
       <section
         style={{
@@ -203,7 +203,7 @@ export default function PortfolioPage() {
 
           <img
             src={images[lightbox]}
-            alt=""
+            alt={`TONO OPERATION 위탁운영 숙소 ${lightbox + 1}`}
             onClick={(e) => e.stopPropagation()}
             style={{
               maxWidth: '90%', maxHeight: '85vh',
@@ -269,6 +269,6 @@ export default function PortfolioPage() {
           .portfolio-grid { columns: 1 !important; }
         }
       `}</style>
-    </>
+    </main>
   )
 }

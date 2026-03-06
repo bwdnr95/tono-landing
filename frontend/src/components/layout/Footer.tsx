@@ -16,19 +16,20 @@ export default function Footer() {
             STAYTECH가 숙소 운영을 바꿉니다. 숙소를 TONIFY 하세요.
           </p>
         </div>
-        <div
+        <address
           style={{
             fontSize: '0.75rem',
             color: 'var(--tx-d)',
             textAlign: 'right',
             lineHeight: 1.7,
+            fontStyle: 'normal',
           }}
         >
           TONO OPERATION · 제주특별자치도 서귀포시 동홍북로 27-11 3층
           <br />
           <a href="tel:064-763-9500">064-763-9500</a> ·{' '}
           <a href="mailto:contact@tono-operation.com">contact@tono-operation.com</a> · 09:00~21:00 연중무휴
-        </div>
+        </address>
       </footer>
 
       <style>{`

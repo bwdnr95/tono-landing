@@ -76,7 +76,7 @@ export default function ServicePage() {
   const navigate = useNavigate()
 
   return (
-    <div ref={ref}>
+    <main ref={ref}>
       {/* Hero */}
       <section style={{ paddingTop: '160px', textAlign: 'center' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto' }} className="anim">
@@ -252,6 +252,6 @@ export default function ServicePage() {
           </button>
         </div>
       </section>
-    </div>
+    </main>
   )
 }

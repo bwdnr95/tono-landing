@@ -11,7 +11,7 @@ import CTA from '../components/home/CTA.tsx'
 
 export default function HomePage() {
   return (
-    <>
+    <main>
       <Hero />
       <PainPoints />
       <BeforeAfter />
@@ -22,6 +22,6 @@ export default function HomePage() {
       <Testimonials />
       <About />
       <CTA />
-    </>
+    </main>
   )
 }
