@@ -2,7 +2,10 @@ import { useState, useEffect } from 'react'
 
 type Theme = 'dark' | 'light'
 
+const isServer = typeof window === 'undefined'
+
 function getInitialTheme(): Theme {
+  if (isServer) return 'dark'
   const stored = localStorage.getItem('theme') as Theme | null
   if (stored === 'dark' || stored === 'light') return stored
   if (window.matchMedia('(prefers-color-scheme: light)').matches) return 'light'
