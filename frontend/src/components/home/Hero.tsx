@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 
 const stats = [
-  { num: '169+', label: 'TONO와 함께하는 숙소' },
+  { num: '192+', label: 'TONO와 함께하는 숙소' },
   { num: '88%', label: '월평균 점유율 · 제주 평균 대비 +25%p' },
   { num: '80%', label: '게스트 문의 AI 자동 처리' },
   { num: '24/7', label: '무중단 운영' },
