@@ -8,12 +8,12 @@ from app.models.contact import ContactRequest
 logger = logging.getLogger(__name__)
 
 
-async def send_slack_notification(data: ContactRequest) -> None:
+async def send_slack_notification(data: ContactRequest) -> bool:
     """Slack 웹훅으로 상담 신청 알림을 전송한다. URL 미설정 시 skip."""
     webhook_url = os.getenv("SLACK_WEBHOOK_URL", "")
     if not webhook_url:
-        logger.debug("SLACK_WEBHOOK_URL 미설정 — Slack 알림 생략")
-        return
+        logger.warning("SLACK_WEBHOOK_URL 미설정 — Slack 알림 생략")
+        return False
 
     fields = [
         f"*이름:* {data.name}",
@@ -58,3 +58,4 @@ async def send_slack_notification(data: ContactRequest) -> None:
         resp.raise_for_status()
 
     logger.info("Slack 알림 전송 완료")
+    return True

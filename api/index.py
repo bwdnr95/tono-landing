@@ -15,7 +15,7 @@ from email.mime.text import MIMEText
 
 import gspread
 import httpx
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
@@ -26,6 +26,12 @@ from pydantic import BaseModel, field_validator
 # Logging
 # ---------------------------------------------------------------------------
 logger = logging.getLogger(__name__)
+
+FALSE_ENV_VALUES = {"0", "false", "no", "off"}
+
+
+def _contact_notification_required() -> bool:
+    return os.getenv("CONTACT_NOTIFICATION_REQUIRED", "true").strip().lower() not in FALSE_ENV_VALUES
 
 # ---------------------------------------------------------------------------
 # Models
@@ -83,10 +89,11 @@ app.add_middleware(
 # ---------------------------------------------------------------------------
 # Slack
 # ---------------------------------------------------------------------------
-async def send_slack_notification(data: ContactRequest) -> None:
+async def send_slack_notification(data: ContactRequest) -> bool:
     webhook_url = os.getenv("SLACK_WEBHOOK_URL", "")
     if not webhook_url:
-        return
+        logger.warning("SLACK_WEBHOOK_URL 미설정 — Slack 알림 생략")
+        return False
 
     fields = [f"*이름:* {data.name}", f"*연락처:* {data.phone}"]
     if data.email:
@@ -113,6 +120,8 @@ async def send_slack_notification(data: ContactRequest) -> None:
     async with httpx.AsyncClient(timeout=10) as client:
         resp = await client.post(webhook_url, json=payload)
         resp.raise_for_status()
+
+    return True
 
 
 # ---------------------------------------------------------------------------
@@ -284,21 +293,15 @@ def _create_message(sender: str, to: str, subject: str, html: str) -> dict:
     return {"raw": raw}
 
 
-async def send_confirmation_email(data: ContactRequest) -> None:
+async def send_confirmation_email(data: ContactRequest) -> bool:
     service = _get_gmail_service()
     if service is None:
-        return
+        logger.warning("GMAIL_TOKEN_JSON 미설정 또는 인증 실패 — 이메일 발송 생략")
+        return False
 
     sender_email = os.getenv("GMAIL_SENDER", "contact@tono-operation.com")
     admin_email = os.getenv("ADMIN_EMAIL", "contact@tono-operation.com")
     sender = f"TONO OPERATION <{sender_email}>"
-
-    customer_msg = _create_message(
-        sender=sender, to=data.email,
-        subject=f"[TONO] {data.name}님, 상담 신청이 접수되었습니다",
-        html=_build_customer_html(data),
-    )
-    service.users().messages().send(userId="me", body=customer_msg).execute()
 
     admin_msg = _create_message(
         sender=sender, to=admin_email,
@@ -306,6 +309,18 @@ async def send_confirmation_email(data: ContactRequest) -> None:
         html=_build_admin_html(data),
     )
     service.users().messages().send(userId="me", body=admin_msg).execute()
+
+    customer_msg = _create_message(
+        sender=sender, to=data.email,
+        subject=f"[TONO] {data.name}님, 상담 신청이 접수되었습니다",
+        html=_build_customer_html(data),
+    )
+    try:
+        service.users().messages().send(userId="me", body=customer_msg).execute()
+    except Exception:
+        logger.exception("고객 확인 이메일 발송 실패")
+
+    return True
 
 
 # ---------------------------------------------------------------------------
@@ -318,11 +333,12 @@ async def health():
 
 @app.post("/api/contact", response_model=ContactResponse)
 async def submit_contact(data: ContactRequest) -> ContactResponse:
-    async def _safe_slack():
+    async def _safe_slack() -> bool:
         try:
-            await send_slack_notification(data)
+            return await send_slack_notification(data)
         except Exception:
             logger.exception("Slack 알림 전송 실패")
+            return False
 
     async def _safe_sheets():
         try:
@@ -330,12 +346,19 @@ async def submit_contact(data: ContactRequest) -> ContactResponse:
         except Exception:
             logger.exception("Google Sheets 기록 실패")
 
-    async def _safe_email():
+    async def _safe_email() -> bool:
         try:
-            await send_confirmation_email(data)
+            return await send_confirmation_email(data)
         except Exception:
             logger.exception("이메일 발송 실패")
+            return False
 
-    await asyncio.gather(_safe_slack(), _safe_sheets(), _safe_email())
+    slack_sent, _, admin_email_sent = await asyncio.gather(_safe_slack(), _safe_sheets(), _safe_email())
+
+    if _contact_notification_required() and not (slack_sent or admin_email_sent):
+        raise HTTPException(
+            status_code=503,
+            detail="상담 신청 알림 전송에 실패했습니다. 이메일 또는 전화로 문의해주세요.",
+        )
 
     return ContactResponse(success=True, message="상담 신청이 접수되었습니다.")

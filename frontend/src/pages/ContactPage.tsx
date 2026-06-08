@@ -60,6 +60,7 @@ export default function ContactPage() {
   const [form, setForm] = useState<FormData>(initialForm)
   const [submitted, setSubmitted] = useState(false)
   const [submitting, setSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState<string | null>(null)
 
   const handleChange = (field: keyof FormData, value: string) => {
     setForm((prev) => ({ ...prev, [field]: value }))
@@ -69,6 +70,18 @@ export default function ContactPage() {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
   const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({})
+
+  const buildMailtoUrl = () => {
+    const subject = encodeURIComponent(`[상담신청] ${form.name}`)
+    const body = encodeURIComponent(
+      `이름: ${form.name}\n연락처: ${form.phone}\n이메일: ${form.email}\n숙소 위치: ${form.location}\n숙소 유형: ${form.propertyType}\n객실 수: ${form.rooms}\n관심 서비스: ${form.service}\n\n문의 내용:\n${form.message}`
+    )
+    return `mailto:contact@tono-operation.com?subject=${subject}&body=${body}`
+  }
+
+  const openMailFallback = () => {
+    window.location.href = buildMailtoUrl()
+  }
 
   const validate = (): boolean => {
     const newErrors: Partial<Record<keyof FormData, string>> = {}
@@ -102,6 +115,7 @@ export default function ContactPage() {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
     if (!validate()) return
+    setSubmitError(null)
     setSubmitting(true)
 
     try {
@@ -114,22 +128,12 @@ export default function ContactPage() {
       if (res.ok) {
         setSubmitted(true)
       } else {
-        // Fallback: mailto
-        const subject = encodeURIComponent(`[상담신청] ${form.name}`)
-        const body = encodeURIComponent(
-          `이름: ${form.name}\n연락처: ${form.phone}\n이메일: ${form.email}\n숙소 위치: ${form.location}\n숙소 유형: ${form.propertyType}\n객실 수: ${form.rooms}\n관심 서비스: ${form.service}\n\n문의 내용:\n${form.message}`
-        )
-        window.location.href = `mailto:contact@tono-operation.com?subject=${subject}&body=${body}`
-        setSubmitted(true)
+        openMailFallback()
+        setSubmitError('자동 접수 알림에 문제가 있어 이메일 앱으로 연결했습니다. 메일 발송을 완료해주세요.')
       }
     } catch {
-      // Fallback: mailto
-      const subject = encodeURIComponent(`[상담신청] ${form.name}`)
-      const body = encodeURIComponent(
-        `이름: ${form.name}\n연락처: ${form.phone}\n이메일: ${form.email}\n숙소 위치: ${form.location}\n숙소 유형: ${form.propertyType}\n객실 수: ${form.rooms}\n관심 서비스: ${form.service}\n\n문의 내용:\n${form.message}`
-      )
-      window.location.href = `mailto:contact@tono-operation.com?subject=${subject}&body=${body}`
-      setSubmitted(true)
+      openMailFallback()
+      setSubmitError('자동 접수 알림에 문제가 있어 이메일 앱으로 연결했습니다. 메일 발송을 완료해주세요.')
     } finally {
       setSubmitting(false)
     }
@@ -292,6 +296,24 @@ export default function ContactPage() {
                   />
                   {errors.message && <p style={{ fontSize: '0.75rem', color: 'var(--red)', marginTop: '6px' }}>{errors.message}</p>}
                 </div>
+
+                {submitError && (
+                  <p
+                    role="alert"
+                    style={{
+                      margin: '0 0 16px',
+                      padding: '12px 14px',
+                      background: 'rgba(208, 79, 79, 0.08)',
+                      border: '1px solid rgba(208, 79, 79, 0.22)',
+                      borderRadius: '10px',
+                      color: 'var(--red)',
+                      fontSize: '0.82rem',
+                      lineHeight: 1.6,
+                    }}
+                  >
+                    {submitError}
+                  </p>
+                )}
 
                 <button
                   type="submit"

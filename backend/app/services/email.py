@@ -232,26 +232,17 @@ def _create_message(sender: str, to: str, subject: str, html: str) -> dict:
     return {"raw": raw}
 
 
-async def send_confirmation_email(data: ContactRequest) -> None:
+async def send_confirmation_email(data: ContactRequest) -> bool:
     """Gmail API로 상담 접수 확인 이메일 발송 (고객 + 관리자)"""
     service = _get_gmail_service()
     if service is None:
-        return
+        return False
 
     sender_email = os.getenv("GMAIL_SENDER", "contact@tono-operation.com")
     admin_email = os.getenv("ADMIN_EMAIL", "contact@tono-operation.com")
     sender = f"TONO OPERATION <{sender_email}>"
 
-    # 1) 고객 접수 확인
-    customer_msg = _create_message(
-        sender=sender,
-        to=data.email,
-        subject=f"[TONO] {data.name}님, 상담 신청이 접수되었습니다",
-        html=_build_customer_html(data),
-    )
-    service.users().messages().send(userId="me", body=customer_msg).execute()
-
-    # 2) 관리자 알림
+    # 1) 관리자 알림을 먼저 전송해 접수 누락 가능성을 줄인다.
     admin_msg = _create_message(
         sender=sender,
         to=admin_email,
@@ -260,4 +251,17 @@ async def send_confirmation_email(data: ContactRequest) -> None:
     )
     service.users().messages().send(userId="me", body=admin_msg).execute()
 
-    logger.info("Gmail API 이메일 발송 완료 — 고객: %s, 관리자: %s", data.email, admin_email)
+    # 2) 고객 접수 확인
+    customer_msg = _create_message(
+        sender=sender,
+        to=data.email,
+        subject=f"[TONO] {data.name}님, 상담 신청이 접수되었습니다",
+        html=_build_customer_html(data),
+    )
+    try:
+        service.users().messages().send(userId="me", body=customer_msg).execute()
+    except Exception:
+        logger.exception("고객 확인 이메일 발송 실패")
+
+    logger.info("Gmail API 관리자 이메일 발송 완료 — 관리자: %s, 고객 확인 대상: %s", admin_email, data.email)
+    return True

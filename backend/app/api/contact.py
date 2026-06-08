@@ -4,7 +4,7 @@ import logging
 import os
 from datetime import datetime
 
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 
 from app.models.contact import ContactRequest, ContactResponse
 from app.services.email import send_confirmation_email
@@ -16,6 +16,11 @@ logger = logging.getLogger(__name__)
 router = APIRouter()
 
 CONTACT_DIR = os.path.join(os.path.dirname(__file__), "..", "..", "contacts")
+FALSE_ENV_VALUES = {"0", "false", "no", "off"}
+
+
+def _contact_notification_required() -> bool:
+    return os.getenv("CONTACT_NOTIFICATION_REQUIRED", "true").strip().lower() not in FALSE_ENV_VALUES
 
 
 @router.post("/contact", response_model=ContactResponse)
@@ -43,12 +48,13 @@ async def submit_contact(data: ContactRequest) -> ContactResponse:
     with open(filepath, "w", encoding="utf-8") as f:
         json.dump(record, f, ensure_ascii=False, indent=2)
 
-    # 2) Slack 알림 + Google Sheets 기록 (비동기 병렬, 실패해도 응답에 영향 없음)
-    async def _safe_slack() -> None:
+    # 2) Slack 알림 + Google Sheets 기록 (비동기 병렬)
+    async def _safe_slack() -> bool:
         try:
-            await send_slack_notification(data)
+            return await send_slack_notification(data)
         except Exception:
             logger.exception("Slack 알림 전송 실패")
+            return False
 
     async def _safe_sheets() -> None:
         try:
@@ -56,12 +62,19 @@ async def submit_contact(data: ContactRequest) -> ContactResponse:
         except Exception:
             logger.exception("Google Sheets 기록 실패")
 
-    async def _safe_email() -> None:
+    async def _safe_email() -> bool:
         try:
-            await send_confirmation_email(data)
+            return await send_confirmation_email(data)
         except Exception:
             logger.exception("이메일 발송 실패")
+            return False
 
-    await asyncio.gather(_safe_slack(), _safe_sheets(), _safe_email())
+    slack_sent, _, admin_email_sent = await asyncio.gather(_safe_slack(), _safe_sheets(), _safe_email())
+
+    if _contact_notification_required() and not (slack_sent or admin_email_sent):
+        raise HTTPException(
+            status_code=503,
+            detail="상담 신청 알림 전송에 실패했습니다. 이메일 또는 전화로 문의해주세요.",
+        )
 
     return ContactResponse(success=True, message="상담 신청이 접수되었습니다.")
