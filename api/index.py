@@ -331,6 +331,11 @@ async def health():
     return {"status": "ok"}
 
 
+@app.get("/")
+async def function_health():
+    return {"status": "ok"}
+
+
 @app.post("/api/contact", response_model=ContactResponse)
 async def submit_contact(data: ContactRequest) -> ContactResponse:
     async def _safe_slack() -> bool:
@@ -362,3 +367,8 @@ async def submit_contact(data: ContactRequest) -> ContactResponse:
         )
 
     return ContactResponse(success=True, message="상담 신청이 접수되었습니다.")
+
+
+@app.post("/", response_model=ContactResponse)
+async def submit_contact_function(data: ContactRequest) -> ContactResponse:
+    return await submit_contact(data)
